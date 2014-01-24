@@ -10,7 +10,7 @@ PyDoc_STRVAR(listen_doc,
 "listen(application, host, port) -> None\n\n \
 \
 Makes uvweb listen to host:port and use application as WSGI callback. \
-(This does not run the server mainloop.)");	//---------------------ÎÄµµ×Ö·û´®
+(This does not run the server mainloop.)");	//---------------------æ–‡æ¡£å­—ç¬¦ä¸²
 static PyObject* listens(PyObject* self, PyObject* args)
 {
   const char* host;
@@ -27,13 +27,13 @@ static PyObject* listens(PyObject* self, PyObject* args)
   if(!PyArg_ParseTuple(args, "Osi:run/listen", &wsgi_app, &host, &port))
     return NULL;
 
-  _initialize_request_module(host, port);	//³õÊ¼»¯ wsgi µÄÒ»Ğ©ÊôĞÔĞÅÏ¢
+  _initialize_request_module(host, port);	//åˆå§‹åŒ– wsgi çš„ä¸€äº›å±æ€§ä¿¡æ¯
 
 
-  //PyRun_SimpleString("import os\n"	//ÔËĞĞÒ»¶Î´úÂë
+  //PyRun_SimpleString("import os\n"	//è¿è¡Œä¸€æ®µä»£ç 
   //"print os\n");
 
-  if(server_run(host, port)) {	//³õÊ¼»¯Ì×½Ó×Ö
+  if(server_run(host, port)) {	//åˆå§‹åŒ–å¥—æ¥å­—
     PyErr_Format(
       PyExc_RuntimeError,
       "Could not start server on %s:%d", host, port
@@ -41,7 +41,7 @@ static PyObject* listens(PyObject* self, PyObject* args)
     return NULL;
   }
 
-  Py_RETURN_NONE;	// python ·µ»Ø¿ÕÖµ
+  Py_RETURN_NONE;	// python è¿”å›ç©ºå€¼
 }
 
 PyDoc_STRVAR(run_doc,
@@ -54,7 +54,7 @@ run() without arguments.");
 
 static PyObject* run(PyObject* self, PyObject* args)
 {
-  if(PyTuple_GET_SIZE(args) == 0) {	//²ÎÊıÊıÁ¿µÄÅĞ¶Ï
+  if(PyTuple_GET_SIZE(args) == 0) {	//å‚æ•°æ•°é‡çš„åˆ¤æ–­
     /* uvweb.run() */
     if(!wsgi_app) {
       PyErr_SetString(
@@ -73,20 +73,20 @@ static PyObject* run(PyObject* self, PyObject* args)
 //  PyRun_SimpleString("def wsgi_app(environ, start_response):\n"
 //							  "\tstart_response('200 OK', [])\n"
 //							  "\tyield 'Hello world'\n"
-//							  "\tyield ''\n");	//ÔËĞĞÒ»¶Î´úÂë
-//  PyRun_SimpleString("print wsgi_app\n");	//ÔËĞĞÒ»¶Î´úÂë
-//  server_run();	//ÔËĞĞ·şÎñÆ÷Ñ­»·
+//							  "\tyield ''\n");	//è¿è¡Œä¸€æ®µä»£ç 
+//  PyRun_SimpleString("print wsgi_app\n");	//è¿è¡Œä¸€æ®µä»£ç 
+//  server_run();	//è¿è¡ŒæœåŠ¡å™¨å¾ªç¯
   wsgi_app = NULL;
   Py_RETURN_NONE;
 }
-	//----------------------------------------------------------------------------------------------------cÄ£¿éº¯ÊıÃû³ÆÓ³Éä±í
-static PyMethodDef uvweb_FunctionTable[] = {	// python À©Õ¹Ä£¿éfuntion¶¨Òå
+	//----------------------------------------------------------------------------------------------------cæ¨¡å—å‡½æ•°åç§°æ˜ å°„è¡¨
+static PyMethodDef uvweb_FunctionTable[] = {	// python æ‰©å±•æ¨¡å—funtionå®šä¹‰
   {"run", run, METH_VARARGS, run_doc},	//uvweb.run(wsgi_application, host, port)
   {"listens", listens, METH_VARARGS, listen_doc}, //uvweb.listen(wsgi_application, host, port)
   {NULL, NULL, 0, NULL}
 };
 
-PyMODINIT_FUNC inituvweb()	//cÄ£¿éµÄ³õÊ¼»¯º¯Êı
+PyMODINIT_FUNC inituvweb()	//cæ¨¡å—çš„åˆå§‹åŒ–å‡½æ•°
 {
   PyObject* uvweb_module;
   _init_common();

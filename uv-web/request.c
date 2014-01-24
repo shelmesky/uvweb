@@ -8,7 +8,7 @@
 static inline void PyDict_ReplaceKey(PyObject* dict, PyObject* k1, PyObject* k2);
 static PyObject* wsgi_http_header(string header);
 static http_parser_settings parser_settings;
-static PyObject* wsgi_base_dict = NULL;	//wsgi·şÎñÆ÷»ù±¾ĞÅÏ¢×Öµä				È«¾Ö±äÁ¿
+static PyObject* wsgi_base_dict = NULL;	//wsgiæœåŠ¡å™¨åŸºæœ¬ä¿¡æ¯å­—å…¸				å…¨å±€å˜é‡
 
 /* Non-public type from cStringIO I abuse in on_body */
 typedef struct {
@@ -20,14 +20,14 @@ typedef struct {
 
 Request* Request_new(int client_fd, const char* client_addr)
 {
-  Request* request = malloc(sizeof(Request));	//·ÖÅäÄÚ´æ
+  Request* request = malloc(sizeof(Request));	//åˆ†é…å†…å­˜
 #ifdef DEBUG
   static unsigned long request_id = 0;
   request->id = request_id++;
 #endif
   request->client_fd = client_fd;
   request->client_addr = PyString_FromString(client_addr);
-  http_parser_init((http_parser*)&request->parser, HTTP_REQUEST);	//³õÊ¼»¯Õâ¸ö½á¹¹,²¢ÉèÖÃºÃ»Øµ÷º¯Êı.    HTTP ParserÊÇÒ»¸öÓÃC±àĞ´µÄHTTPÏûÏ¢·ÖÎö¹¤¾ß. ¼È·ÖÎöÇëÇóÒ²·ÖÎöÏìÓ¦£¬Ëü²»Ê¹ÓÃÈÎºÎÏµÍ³µ÷ÓÃÒ²²»·ÖÅäÄÚ´æ£¬²»»º´æÊı¾İ, ¿ÉÒÔÔÚÈÎºÎÊ±ºò±»ÖĞ¶Ï
+  http_parser_init((http_parser*)&request->parser, HTTP_REQUEST);	//åˆå§‹åŒ–è¿™ä¸ªç»“æ„,å¹¶è®¾ç½®å¥½å›è°ƒå‡½æ•°.    HTTP Parseræ˜¯ä¸€ä¸ªç”¨Cç¼–å†™çš„HTTPæ¶ˆæ¯åˆ†æå·¥å…·. æ—¢åˆ†æè¯·æ±‚ä¹Ÿåˆ†æå“åº”ï¼Œå®ƒä¸ä½¿ç”¨ä»»ä½•ç³»ç»Ÿè°ƒç”¨ä¹Ÿä¸åˆ†é…å†…å­˜ï¼Œä¸ç¼“å­˜æ•°æ®, å¯ä»¥åœ¨ä»»ä½•æ—¶å€™è¢«ä¸­æ–­
   request->parser.parser.data = request;
   Request_reset(request);
   return request;
@@ -35,22 +35,22 @@ Request* Request_new(int client_fd, const char* client_addr)
 
 Request* Request_init()
 {
-  Request* request = malloc(sizeof(Request));	//·ÖÅäÄÚ´æ
+  Request* request = malloc(sizeof(Request));	//åˆ†é…å†…å­˜
 #ifdef DEBUG
   static unsigned long request_id = 0;
   request->id = request_id++;
 #endif
-  http_parser_init((http_parser*)&request->parser, HTTP_REQUEST);	//³õÊ¼»¯Õâ¸ö½á¹¹,²¢ÉèÖÃºÃ»Øµ÷º¯Êı.    HTTP ParserÊÇÒ»¸öÓÃC±àĞ´µÄHTTPÏûÏ¢·ÖÎö¹¤¾ß. ¼È·ÖÎöÇëÇóÒ²·ÖÎöÏìÓ¦£¬Ëü²»Ê¹ÓÃÈÎºÎÏµÍ³µ÷ÓÃÒ²²»·ÖÅäÄÚ´æ£¬²»»º´æÊı¾İ, ¿ÉÒÔÔÚÈÎºÎÊ±ºò±»ÖĞ¶Ï
+  http_parser_init((http_parser*)&request->parser, HTTP_REQUEST);	//åˆå§‹åŒ–è¿™ä¸ªç»“æ„,å¹¶è®¾ç½®å¥½å›è°ƒå‡½æ•°.    HTTP Parseræ˜¯ä¸€ä¸ªç”¨Cç¼–å†™çš„HTTPæ¶ˆæ¯åˆ†æå·¥å…·. æ—¢åˆ†æè¯·æ±‚ä¹Ÿåˆ†æå“åº”ï¼Œå®ƒä¸ä½¿ç”¨ä»»ä½•ç³»ç»Ÿè°ƒç”¨ä¹Ÿä¸åˆ†é…å†…å­˜ï¼Œä¸ç¼“å­˜æ•°æ®, å¯ä»¥åœ¨ä»»ä½•æ—¶å€™è¢«ä¸­æ–­
   request->parser.parser.data = request;
   Request_reset(request);
   return request;
 }
 
-void Request_reset(Request* request)	//Request¶ÔÏóµÄ³õÊ¼»¯ state ºÍ parser.bodyÇå¿Õ
+void Request_reset(Request* request)	//Requestå¯¹è±¡çš„åˆå§‹åŒ– state å’Œ parser.bodyæ¸…ç©º
 {
   string m;
   dprint("Request_reset...");
-  memset(&request->state, 0, sizeof(Request) - (size_t)&((Request*)NULL)->state);	//memset:×÷ÓÃÊÇÔÚÒ»¶ÎÄÚ´æ¿éÖĞÌî³äÄ³¸ö¸ø¶¨µÄÖµ£¬Ëü¶Ô½Ï´óµÄ½á¹¹Ìå»òÊı×é½øĞĞÇåÁã²Ù×÷µÄÒ»ÖÖ×î¿ì·½·¨
+  memset(&request->state, 0, sizeof(Request) - (size_t)&((Request*)NULL)->state);	//memset:ä½œç”¨æ˜¯åœ¨ä¸€æ®µå†…å­˜å—ä¸­å¡«å……æŸä¸ªç»™å®šçš„å€¼ï¼Œå®ƒå¯¹è¾ƒå¤§çš„ç»“æ„ä½“æˆ–æ•°ç»„è¿›è¡Œæ¸…é›¶æ“ä½œçš„ä¸€ç§æœ€å¿«æ–¹æ³•
   request->state.response_length_unknown = true;
   m.data = NULL;
   m.len = 0;
@@ -92,10 +92,10 @@ void Request_parse(Request* request, const char* data, const size_t data_len)
 {
   size_t nparsed;
   assert(data_len);
-  dprint("½âÎöÈçÏÂÇëÇó:%d\n%s",data_len,data);
+  dprint("è§£æå¦‚ä¸‹è¯·æ±‚:%d\n%s",data_len,data);
   nparsed = http_parser_execute((http_parser*)&request->parser,
                                        &parser_settings, data, data_len);
-  dprint("´¦ÀíÍê³ÉµÄÊı¾İ:%d",nparsed);
+  dprint("å¤„ç†å®Œæˆçš„æ•°æ®:%d",nparsed);
   if(nparsed != data_len)
   {
     dprint("************HTTP_BAD_REQUEST************ %d | %d \n",data_len,nparsed);
@@ -316,19 +316,19 @@ PyDict_ReplaceKey(PyObject* dict, PyObject* old_key, PyObject* new_key)
   }
 }
 
-// http½âÎöÆ÷»Øµ÷º¯ÊıÉèÖÃ
+// httpè§£æå™¨å›è°ƒå‡½æ•°è®¾ç½®
 static http_parser_settings
 parser_settings = {
   on_message_begin, on_path, on_query_string, NULL, NULL, on_header_field,
   on_header_value, on_headers_complete, on_body, on_message_complete
 };
 
-// wsgi·şÎñÆ÷Ïà¹ØĞÅÏ¢³õÊ¼»¯
+// wsgiæœåŠ¡å™¨ç›¸å…³ä¿¡æ¯åˆå§‹åŒ–
 void _initialize_request_module(const char* server_host, const int server_port)	
 {
-  if(wsgi_base_dict == NULL) {	//CÓïÑÔÖĞ£¬ËùÓĞµÄPythonÀàĞÍ¶¼±»ÉùÃ÷ÎªPyObjectĞÍ Py_BuildValue()º¯Êı¶ÔÊı×ÖºÍ×Ö·û´®½øĞĞ×ª»»´¦Àí£¬Ê¹Ö®±ä³ÉPythonÖĞÏàÓ¦µÄÊı¾İÀàĞÍ PyObject* Py_BuildValue( const char *format, ...)
+  if(wsgi_base_dict == NULL) {	//Cè¯­è¨€ä¸­ï¼Œæ‰€æœ‰çš„Pythonç±»å‹éƒ½è¢«å£°æ˜ä¸ºPyObjectå‹ Py_BuildValue()å‡½æ•°å¯¹æ•°å­—å’Œå­—ç¬¦ä¸²è¿›è¡Œè½¬æ¢å¤„ç†ï¼Œä½¿ä¹‹å˜æˆPythonä¸­ç›¸åº”çš„æ•°æ®ç±»å‹ PyObject* Py_BuildValue( const char *format, ...)
     PycString_IMPORT;
-    wsgi_base_dict = PyDict_New();	//´´½¨python×Öµä
+    wsgi_base_dict = PyDict_New();	//åˆ›å»ºpythonå­—å…¸
 
     /* dct['wsgi.file_wrapper'] = FileWrapper */
     PyDict_SetItemString(
@@ -337,67 +337,67 @@ void _initialize_request_module(const char* server_host, const int server_port)
       (PyObject*)&FileWrapper_Type
     );
 
-    /* dct['SCRIPT_NAME'] = '' */	//·şÎñÆ÷ÃèÊöÃû³Æ SCRIPT_NAME Ä¬ÈÏÎª¿Õ
+    /* dct['SCRIPT_NAME'] = '' */	//æœåŠ¡å™¨æè¿°åç§° SCRIPT_NAME é»˜è®¤ä¸ºç©º
     PyDict_SetItemString(
       wsgi_base_dict,
       "SCRIPT_NAME",
-      _empty_string		// python¿ÕÀàĞÍ
+      _empty_string		// pythonç©ºç±»å‹
     );
 
-    /* dct['wsgi.version'] = (1, 0) */	//·şÎñÆ÷°æ±¾
+    /* dct['wsgi.version'] = (1, 0) */	//æœåŠ¡å™¨ç‰ˆæœ¬
     PyDict_SetItemString(
       wsgi_base_dict,
       "wsgi.version",
-      PyTuple_Pack(2, PyInt_FromLong(1), PyInt_FromLong(0))	// pythonÔª×é
+      PyTuple_Pack(2, PyInt_FromLong(1), PyInt_FromLong(0))	// pythonå…ƒç»„
     );
 
-    /* dct['wsgi.url_scheme'] = 'http'	//´«ÊäĞ­ÒéÀàĞÍ 	°²È«´«Êä²ãĞ­Òé£¨TLS£©
+    /* dct['wsgi.url_scheme'] = 'http'	//ä¼ è¾“åè®®ç±»å‹ 	å®‰å…¨ä¼ è¾“å±‚åè®®ï¼ˆTLSï¼‰
      * (This can be hard-coded as there is no TLS support in uvweb.) */
     PyDict_SetItemString(
       wsgi_base_dict,
       "wsgi.url_scheme",
-      PyString_FromString("http")	// python×Ö·û´®ÀàĞÍ
+      PyString_FromString("http")	// pythonå­—ç¬¦ä¸²ç±»å‹
     );
 
-    /* dct['wsgi.errors'] = sys.stderr */	// ÏµÍ³±ê×¼´íÎóÉè±¸
+    /* dct['wsgi.errors'] = sys.stderr */	// ç³»ç»Ÿæ ‡å‡†é”™è¯¯è®¾å¤‡
     PyDict_SetItemString(
       wsgi_base_dict,
       "wsgi.errors",
-      PySys_GetObject("stderr")	// python sysÄ£¿é±ê×¼´íÎóÉè±¸
+      PySys_GetObject("stderr")	// python sysæ¨¡å—æ ‡å‡†é”™è¯¯è®¾å¤‡
     );
 
     /* dct['wsgi.multithread'] = True
      * If I correctly interpret the WSGI specs, this means
      * "Can the server be ran in a thread?" */
-    PyDict_SetItemString(	// ÊÇ·ñ¶àÏß³Ì
+    PyDict_SetItemString(	// æ˜¯å¦å¤šçº¿ç¨‹
       wsgi_base_dict,
       "wsgi.multithread",
-      Py_True	// python ²¼¶ûÀàĞÍ
+      Py_True	// python å¸ƒå°”ç±»å‹
     );
 
     /* dct['wsgi.multiprocess'] = True
      * ... and this one "Can the server process be forked?" */
-    PyDict_SetItemString(	// ÊÇ·ñ¶à½ø³Ì
+    PyDict_SetItemString(	// æ˜¯å¦å¤šè¿›ç¨‹
       wsgi_base_dict,
       "wsgi.multiprocess",
       Py_True
     );
 
     /* dct['wsgi.run_once'] = False (uvweb is no CGI gateway) */
-    PyDict_SetItemString(	// ÊÇ·ñ CGIÊ½µÄrun_onceÄ£Ê½
+    PyDict_SetItemString(	// æ˜¯å¦ CGIå¼çš„run_onceæ¨¡å¼
       wsgi_base_dict,
       "wsgi.run_once",
       Py_False
     );
   }
 
-  PyDict_SetItemString(	//Ö÷»úÃû»òIP
+  PyDict_SetItemString(	//ä¸»æœºåæˆ–IP
     wsgi_base_dict,
     "SERVER_NAME",
     PyString_FromString(server_host)
   );
 
-  PyDict_SetItemString(	//¶Ë¿ÚºÅ
+  PyDict_SetItemString(	//ç«¯å£å·
     wsgi_base_dict,
     "SERVER_PORT",
     PyString_FromFormat("%d", server_port)

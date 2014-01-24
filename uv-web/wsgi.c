@@ -10,14 +10,14 @@ static size_t wsgi_getheaders(Request*, PyObject* buf);
 static inline bool inspect_headers(Request*);
 static inline bool should_keep_alive(Request*);
 
-typedef struct {	//¶ÔPyObject½øĞĞ°ü×°µÃµ½µÄÀàĞÍ
+typedef struct {	//å¯¹PyObjectè¿›è¡ŒåŒ…è£…å¾—åˆ°çš„ç±»å‹
   PyObject_HEAD
   Request* request;
 } StartResponse;
 
 bool wsgi_call_application(Request* request)
 {
-  StartResponse* start_response=PyObject_NEW(StartResponse, &StartResponse_Type);//¹¹ÔìÁËÒ»¸ö×Ô¶¨ÒåµÄ¶ÔÏó
+  StartResponse* start_response=PyObject_NEW(StartResponse, &StartResponse_Type);//æ„é€ äº†ä¸€ä¸ªè‡ªå®šä¹‰çš„å¯¹è±¡
   PyObject* request_headers;
   PyObject* retval;
   PyObject* first_chunk;
@@ -29,11 +29,11 @@ bool wsgi_call_application(Request* request)
 
   /* From now on, `headers` stores the _response_ headers
    * (passed by the WSGI app) rather than the _request_ headers */
-  request_headers = request->headers;	// ÇëÇóÍ·headers×ª´¢
+  request_headers = request->headers;	// è¯·æ±‚å¤´headersè½¬å‚¨
   request->headers = NULL;
 
   /* application(environ, start_response) call */
-  retval = PyObject_CallFunctionObjArgs(	// ¹¹ÔìÒ»¸ö°ü×°ÁËwsgi_app¿ÉÖ´ĞĞ·½·¨  ÇëÇóÍ· ¿Í»§¶ËÏìÓ¦¶ÔÏó
+  retval = PyObject_CallFunctionObjArgs(	// æ„é€ ä¸€ä¸ªåŒ…è£…äº†wsgi_appå¯æ‰§è¡Œæ–¹æ³•  è¯·æ±‚å¤´ å®¢æˆ·ç«¯å“åº”å¯¹è±¡
     wsgi_app,
     request_headers,
     start_response,
@@ -78,7 +78,7 @@ bool wsgi_call_application(Request* request)
   {
     /* Optimize the most common case, a single string in a list: */
     PyObject* tmp = PyList_GET_ITEM(retval, 0);
-	//printf("------------wsgi ·µ»Øµü´ú¶ÔÏó\n");
+	//printf("------------wsgi è¿”å›è¿­ä»£å¯¹è±¡\n");
     Py_INCREF(tmp);
     Py_DECREF(retval);
     retval = tmp;
@@ -90,7 +90,7 @@ bool wsgi_call_application(Request* request)
       first_chunk = NULL;
     }
   } else if(PyString_Check(retval)) {
-	  //printf("------------wsgi ·µ»Ø×Ö·û¶ÔÏó\n");
+	  //printf("------------wsgi è¿”å›å­—ç¬¦å¯¹è±¡\n");
     /* According to PEP 333 strings should be handled like any other iterable,
      * i.e. sending the response item for item. "item for item" means
      * "char for char" if you have a string. -- I'm not that stupid. */
@@ -102,7 +102,7 @@ bool wsgi_call_application(Request* request)
       first_chunk = NULL;
     }
   } else if(FileWrapper_CheckExact(retval)) {
-	//printf("------------wsgi ·µ»ØÎÄ¼ş¶ÔÏó\n");
+	//printf("------------wsgi è¿”å›æ–‡ä»¶å¯¹è±¡\n");
     request->state.use_sendfile = true;
     request->iterable = ((FileWrapper*)retval)->file;
     Py_INCREF(request->iterable);
@@ -110,7 +110,7 @@ bool wsgi_call_application(Request* request)
     request->iterator = NULL;
     first_chunk = NULL;
   } else {
-	//printf("------------wsgi ·µ»ØÆäËûÆÕÍ¨¶ÔÏó\n");
+	//printf("------------wsgi è¿”å›å…¶ä»–æ™®é€šå¯¹è±¡\n");
     /* Generic iterable (list of length != 1, generator, ...) */
     request->iterable = retval;
     request->iterator = PyObject_GetIter(retval);
@@ -173,7 +173,7 @@ bool wsgi_call_application(Request* request)
          PyString_GET_SIZE(first_chunk));
 
   Py_DECREF(first_chunk);
-  //printf("&&&&&&&&&&&&&&&&&&& wsgi ½á¹û×Ö·û:\n%s\n",buf);
+  //printf("&&&&&&&&&&&&&&&&&&& wsgi ç»“æœå­—ç¬¦:\n%s\n",buf);
 
 out:
   request->state.wsgi_call_done = true;
@@ -282,7 +282,7 @@ restore_exception_tuple(PyObject* exc_info, bool incref_items)
     PyTuple_GET_ITEM(exc_info, 2)
   );
 }
-//-----------------ÀàĞÍ¶ÔÏóµÄ¿Éµ÷ÓÃº¯Êı
+//-----------------ç±»å‹å¯¹è±¡çš„å¯è°ƒç”¨å‡½æ•°
 static PyObject*
 start_response(PyObject* self, PyObject* args, PyObject* kwargs)
 {
@@ -355,7 +355,7 @@ start_response(PyObject* self, PyObject* args, PyObject* kwargs)
   Py_RETURN_NONE;
 }
 
-PyTypeObject StartResponse_Type = {	//ÀàĞÍ¶ÔÏó¶¨Òå
+PyTypeObject StartResponse_Type = {	//ç±»å‹å¯¹è±¡å®šä¹‰
   PyVarObject_HEAD_INIT(NULL, 0)
   "start_response",           /* tp_name (__name__)                         */
   sizeof(StartResponse),      /* tp_basicsize                               */

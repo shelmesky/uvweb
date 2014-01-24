@@ -16,33 +16,33 @@ typedef struct {
   unsigned response_length_unknown : 1;
   unsigned chunked_response : 1;
   unsigned use_sendfile : 1;
-} request_state;	// ¶¨ÒåÇëÇó×´Ì¬×Öµä
+} request_state;	// å®šä¹‰è¯·æ±‚çŠ¶æ€å­—å…¸
 
 typedef struct {
-  http_parser parser;	//½âÎöÆ÷
-  string field;	//×Ö¶Î
-  string value;	//Öµ
-  string body;	 //bodyÌå
+  http_parser parser;	//è§£æå™¨
+  string field;	//å­—æ®µ
+  string value;	//å€¼
+  string body;	 //bodyä½“
 } bj_parser;
 
-typedef struct {	//Request¶ÔÏóµÄ¶¨Òå
+typedef struct {	//Requestå¯¹è±¡çš„å®šä¹‰
 #ifdef DEBUG
   unsigned long id;
 #endif
   bj_parser parser;
   uv_stream_t* ev_watcher;
   uv_write_t write_req;
-  int client_fd;	//¿Í»§¶ËÌ×½Ó×ÖID
-  PyObject* client_addr;	//¿Í»§¶ËÌ×½Ó×ÖµØÖ·
+  int client_fd;	//å®¢æˆ·ç«¯å¥—æ¥å­—ID
+  PyObject* client_addr;	//å®¢æˆ·ç«¯å¥—æ¥å­—åœ°å€
 
-  request_state state;	//ÇëÇó×´Ì¬
+  request_state state;	//è¯·æ±‚çŠ¶æ€
 
-  PyObject* status;	//×´Ì¬Âë
-  PyObject* headers;	//ÇëÇóÍ·
+  PyObject* status;	//çŠ¶æ€ç 
+  PyObject* headers;	//è¯·æ±‚å¤´
   PyObject* current_chunk;
   Py_ssize_t current_chunk_p;
-  PyObject* iterable;	//¿Éµü´ú
-  PyObject* iterator;	//µü´úÆ÷
+  PyObject* iterable;	//å¯è¿­ä»£
+  PyObject* iterator;	//è¿­ä»£å™¨
 } Request;
 
 #define REQUEST_FROM_WATCHER(watcher) \
